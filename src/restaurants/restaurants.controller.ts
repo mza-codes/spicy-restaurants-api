@@ -1,7 +1,16 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+    Controller,
+    Get,
+    Post,
+    Body,
+    Patch,
+    Param,
+    Delete,
+    HttpException,
+} from '@nestjs/common';
 import { RestaurantsService } from './restaurants.service';
-import { CreateRestaurantDto } from './dto/create-restaurant.dto';
-import { UpdateRestaurantDto } from './dto/update-restaurant.dto';
+import { CreateRestaurantDto, UpdateRestaurantDto } from './dto/restaurants.dto';
+import { ObjectId, isValidObjectId } from 'mongoose';
 
 @Controller('restaurants')
 export class RestaurantsController {
@@ -18,17 +27,29 @@ export class RestaurantsController {
     }
 
     @Get(':id')
-    findOne(@Param('id') id: string) {
-        return this.restaurantsService.findOne(+id);
+    findOne(@Param('id') id: string | ObjectId) {
+        id = this.validateObjectId(id);
+        return this.restaurantsService.findOne(id);
     }
 
     @Patch(':id')
-    update(@Param('id') id: string, @Body() updateRestaurantDto: UpdateRestaurantDto) {
-        return this.restaurantsService.update(+id, updateRestaurantDto);
+    update(
+        @Param('id') id: string | ObjectId,
+        @Body() updateRestaurantDto: UpdateRestaurantDto,
+    ) {
+        id = this.validateObjectId(id);
+        return this.restaurantsService.update(id, updateRestaurantDto);
     }
 
     @Delete(':id')
-    remove(@Param('id') id: string) {
-        return this.restaurantsService.remove(+id);
+    remove(@Param('id') id: string | ObjectId) {
+        id = this.validateObjectId(id);
+        return this.restaurantsService.remove(id);
+    }
+
+    private validateObjectId(id: string | ObjectId): ObjectId {
+        const isObjectID = isValidObjectId(id);
+        if (!isObjectID) throw new HttpException('Invalid ID', 400);
+        return id as ObjectId;
     }
 }
