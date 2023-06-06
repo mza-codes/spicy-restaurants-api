@@ -36,7 +36,7 @@ export class Restaurant extends Document implements IRestaurant {
     @Prop({ required: true })
     featured: boolean;
 
-    @Prop({ required: true })
+    @Prop({ required: true, unique: true })
     img: string;
 }
 

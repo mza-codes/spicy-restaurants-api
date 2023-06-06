@@ -1,44 +1,49 @@
 import { PartialType } from '@nestjs/mapped-types';
 import {
+    ArrayMaxSize,
     ArrayMinSize,
     ArrayUnique,
     IsArray,
     IsBoolean,
+    IsEnum,
     IsNotEmpty,
+    IsNotIn,
+    IsNumberString,
     IsString,
-    Validate,
+    IsUrl,
 } from 'class-validator';
 import { IRestaurant, Tags } from '../schemas/restaurants.schema';
-import { IsOneOfEnum } from '../../common/utils/enum-utils';
 
 export class CreateRestaurantDto implements IRestaurant {
     @IsBoolean()
     featured: boolean;
 
-    @IsString()
     @IsNotEmpty()
+    @IsString()
+    @IsUrl()
     img: string;
 
     @IsString()
     @IsNotEmpty()
     place: string;
 
-    @IsString()
+    @IsNumberString()
     @IsNotEmpty()
     price: string;
 
     @IsArray()
     @ArrayMinSize(1)
-    @ArrayUnique()
-    // @Validate(IsOneOfEnum, [Tags]) resolve error
+    @ArrayMaxSize(6)
     @IsString({ each: true })
+    @IsEnum(Tags, { each: true, message: 'One or more tags are invalid' })
+    @ArrayUnique()
     tags: Tags[];
 
     @IsString()
     @IsNotEmpty()
     title: string;
 
-    @IsString()
+    @IsNumberString()
     @IsNotEmpty()
     time: string;
 }

@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { CreateRestaurantDto, UpdateRestaurantDto } from './dto/restaurants.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Restaurant } from './schemas/restaurants.schema';
+import { Restaurant, Tags } from './schemas/restaurants.schema';
 import { Model, ObjectId } from 'mongoose';
+import { isEnum } from 'class-validator';
 
 @Injectable()
 export class RestaurantsService {
@@ -11,17 +12,15 @@ export class RestaurantsService {
         private restaurantModel: Model<Restaurant>,
     ) {}
 
-    validateObjectId(id: string | any): id is ObjectId {
-        return /[0-9a-fA-F]{24}/.test(id);
-    }
-
-    create(createRestaurantDto: CreateRestaurantDto) {
+    async create(createRestaurantDto: CreateRestaurantDto) {
         console.log('@Create => ', createRestaurantDto);
-        return 'This action adds a new restaurant';
+
+        const restaurant = await this.restaurantModel.create(createRestaurantDto);
+        return restaurant;
     }
 
     async findAll() {
-        return await this.restaurantModel.find();
+        return this.restaurantModel.find();
     }
 
     async findOne(id: ObjectId) {
@@ -30,13 +29,31 @@ export class RestaurantsService {
         return restaurant;
     }
 
-    update(id: ObjectId, updateRestaurantDto: UpdateRestaurantDto) {
+    async update(id: ObjectId, updateRestaurantDto: UpdateRestaurantDto) {
         console.log('@Update => ', { updateRestaurantDto, id });
+
         return `This action updates a #${id} restaurant`;
     }
 
-    remove(id: ObjectId) {
+    async remove(id: ObjectId) {
         console.log('@Remove => ', id);
         return `This action removes a #${id} restaurant`;
     }
+
+    private validateTag(tags: string[]): tags is Tags[] {
+        const isValid = tags.map((tag) => {
+            return isEnum(tag, Tags);
+        });
+        console.log('@isValid => ', isValid);
+
+        if (isValid.includes(false)) {
+            throw new HttpException('One or more tags are invalid', 400);
+        } else return true;
+    }
 }
+
+/** 
+ * @param validateObjectId(id: string | any): id is ObjectId {
+        return /[0-9a-fA-F]{24}/.test(id);
+    }
+ */
