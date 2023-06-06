@@ -1,7 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+    Controller,
+    Get,
+    Post,
+    Body,
+    Patch,
+    Param,
+    Delete,
+    HttpException,
+} from '@nestjs/common';
 import { RestaurantsService } from './restaurants.service';
-import { CreateRestaurantDto } from './dto/create-restaurant.dto';
-import { UpdateRestaurantDto } from './dto/update-restaurant.dto';
+import { CreateRestaurantDto, UpdateRestaurantDto } from './dto/restaurants.dto';
 
 @Controller('restaurants')
 export class RestaurantsController {
@@ -19,16 +27,25 @@ export class RestaurantsController {
 
     @Get(':id')
     findOne(@Param('id') id: string) {
-        return this.restaurantsService.findOne(+id);
+        const objectId = this.restaurantsService.validateObjectId(id);
+        if (!objectId) throw new HttpException('Invalid ID', 400);
+
+        return this.restaurantsService.findOne(id);
     }
 
     @Patch(':id')
     update(@Param('id') id: string, @Body() updateRestaurantDto: UpdateRestaurantDto) {
-        return this.restaurantsService.update(+id, updateRestaurantDto);
+        const objectId = this.restaurantsService.validateObjectId(id);
+        if (!objectId) throw new HttpException('Invalid ID', 400);
+
+        return this.restaurantsService.update(id, updateRestaurantDto);
     }
 
     @Delete(':id')
     remove(@Param('id') id: string) {
-        return this.restaurantsService.remove(+id);
+        const objectId = this.restaurantsService.validateObjectId(id);
+        if (!objectId) throw new HttpException('Invalid ID', 400);
+
+        return this.restaurantsService.remove(id);
     }
 }
