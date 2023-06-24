@@ -18,12 +18,13 @@ export class RestaurantsController {
 
     @Post()
     create(@Body() createRestaurantDto: CreateRestaurantDto) {
+        console.log('@adding restaurant', createRestaurantDto);
         return this.restaurantsService.create(createRestaurantDto);
     }
 
     @Get()
     findAll() {
-        return this.restaurantsService.findAll();
+        return this.restaurantsService.findAll().then((data) => data.reverse());
     }
 
     @Get(':id')

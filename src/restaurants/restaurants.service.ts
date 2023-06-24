@@ -20,6 +20,7 @@ export class RestaurantsService {
     }
 
     async findAll() {
+        console.count("@Fetchin data from DB");
         return this.restaurantModel.find();
     }
 
