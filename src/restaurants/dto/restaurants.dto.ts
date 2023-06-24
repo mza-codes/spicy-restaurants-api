@@ -23,9 +23,9 @@ export class CreateRestaurantDto implements IRestaurant {
     @IsUrl()
     img: string;
 
-    @IsString()
-    @IsNotEmpty()
-    place: string;
+    // @IsString()
+    // @IsNotEmpty()
+    // place: string;
 
     @IsNumberString()
     @IsNotEmpty()
